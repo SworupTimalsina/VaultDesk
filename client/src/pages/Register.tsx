@@ -1,12 +1,23 @@
 import { useState } from "react";
 import API from "../api/axios";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import zxcvbn from "zxcvbn";
 
 const Register = () => {
   const [form, setForm] = useState({ email: "", password: "", phone: "" });
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const getPasswordStrength = () => {
+    return zxcvbn(form.password).score;
+  };
+
+  const getStrengthLabel = () => {
+    return ["Too weak", "Weak", "Okay", "Good", "Strong"][getPasswordStrength()];
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -14,6 +25,10 @@ const Register = () => {
     try {
       const res = await API.post("/auth/register", form);
       toast.success(res.data.message || "Registered successfully");
+
+      // 🔐 Save email to localStorage for OTP page
+      localStorage.setItem("userEmail", form.email);
+      navigate("/verify-otp");
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Registration failed");
     }
@@ -55,7 +70,7 @@ const Register = () => {
           />
         </div>
 
-        <div className="mb-6">
+        <div className="mb-1">
           <label className="block mb-1 font-medium">Password</label>
           <input
             type="password"
@@ -67,6 +82,15 @@ const Register = () => {
             required
           />
         </div>
+
+        {/* ✅ Password Strength Meter */}
+        <p
+          className={`text-sm mb-6 ${
+            getPasswordStrength() < 3 ? "text-red-500" : "text-green-600"
+          }`}
+        >
+          Password Strength: {getStrengthLabel()}
+        </p>
 
         <button
           type="submit"

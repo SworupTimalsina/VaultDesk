@@ -1,8 +1,9 @@
 const User = require("../model/User");
 const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
+const { sendOTP } = require("../utils/mailer");
 
-// Register
+// ✅ Register and Send OTP
 exports.register = asyncHandler(async (req, res) => {
   const { email, password, phone } = req.body;
 
@@ -10,34 +11,60 @@ exports.register = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "All fields are required" });
   }
 
-  const userExists = await User.findOne({ email });
-  if (userExists) {
+  const existing = await User.findOne({ email });
+  if (existing) {
     return res.status(400).json({ message: "Email already registered" });
   }
 
-  const user = await User.create({ email, password, phone });
-  res.status(201).json({ message: "User registered successfully" });
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const otpExpires = Date.now() + 10 * 60 * 1000;
+
+  const user = await User.create({ email, password, phone, otp, otpExpires });
+
+  await sendOTP(email, otp);
+
+  res.status(201).json({ message: "OTP sent to your email" });
 });
 
-// Login
+// ✅ Verify OTP
+exports.verifyOTP = asyncHandler(async (req, res) => {
+  const { email, otp } = req.body;
+
+  const user = await User.findOne({ email });
+  if (!user) return res.status(400).json({ message: "Invalid email" });
+
+  if (user.otp !== otp || user.otpExpires < Date.now()) {
+    return res.status(400).json({ message: "Invalid or expired OTP" });
+  }
+
+  user.isVerified = true;
+  user.otp = undefined;
+  user.otpExpires = undefined;
+  await user.save();
+
+  res.status(200).json({ message: "Email verified successfully" });
+});
+
+// ✅ Login (only if verified)
 exports.login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
   if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
-  // Check if account is locked
+  if (!user.isVerified) {
+    return res.status(401).json({ message: "Please verify your email first." });
+  }
+
   if (user.lockedUntil && user.lockedUntil > Date.now()) {
-    return res.status(403).json({ message: "Account temporarily locked. Try again later." });
+    return res.status(403).json({ message: "Account temporarily locked." });
   }
 
   const isMatch = await user.matchPassword(password);
   if (!isMatch) {
     user.loginAttempts += 1;
-
-    // Lock account after 5 failed attempts
     if (user.loginAttempts >= 5) {
-      user.lockedUntil = Date.now() + 15 * 60 * 1000; // lock 15 min
+      user.lockedUntil = Date.now() + 15 * 60 * 1000;
       await user.save();
       return res.status(403).json({ message: "Account locked for 15 minutes." });
     }
@@ -46,17 +73,14 @@ exports.login = asyncHandler(async (req, res) => {
     return res.status(401).json({ message: "Invalid credentials" });
   }
 
-  // Reset failed attempts
   user.loginAttempts = 0;
   user.lockedUntil = null;
   await user.save();
 
-  // Generate token
-  const token = jwt.sign(
-    { userId: user._id, role: user.role },
-    process.env.JWT_SECRET,
-    { expiresIn: "1h" }
-  );
+  const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, {
+    expiresIn: "1h",
+  });
 
   res.status(200).json({ token });
 });
+
