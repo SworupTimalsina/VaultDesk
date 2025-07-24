@@ -1,10 +1,9 @@
 const rateLimit = require("express-rate-limit");
 
-//user have 10 mintues time to verify and maximum 5 attempts
 const loginLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000, 
+  windowMs: 10 * 60 * 1000, // 10 minutes
   max: 5,
-  message: "Too many login attempts. Try again later.",
+  message: "Too many login attempts. Please try again later.",
   standardHeaders: true,
   legacyHeaders: false,
 });

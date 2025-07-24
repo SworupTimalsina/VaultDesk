@@ -2,14 +2,24 @@ import { Link } from "react-router-dom";
 
 const Navbar = () => {
   return (
-    <nav className="bg-blue-700 text-white px-6 py-3 shadow-md">
-      <div className="flex justify-between items-center max-w-6xl mx-auto">
-        <Link to="/" className="text-xl font-bold">
+    <nav className="bg-white shadow-md py-4">
+      <div className="container mx-auto flex justify-between items-center px-6">
+        <Link to="/" className="text-2xl font-bold text-blue-700">
           VaultDesk
         </Link>
-        <div className="space-x-4">
-          <Link to="/login" className="hover:underline">Login</Link>
-          <Link to="/register" className="hover:underline">Register</Link>
+        <div className="space-x-6">
+          <Link
+            to="/login"
+            className="text-gray-700 hover:text-blue-600 font-medium transition"
+          >
+            Login
+          </Link>
+          <Link
+            to="/register"
+            className="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition font-semibold"
+          >
+            Register
+          </Link>
         </div>
       </div>
     </nav>
