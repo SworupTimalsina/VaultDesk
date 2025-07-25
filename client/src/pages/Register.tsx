@@ -25,8 +25,6 @@ const Register = () => {
     try {
       const res = await API.post("/auth/register", form);
       toast.success(res.data.message || "Registered successfully");
-
-      // 🔐 Save email to localStorage for OTP page
       localStorage.setItem("userEmail", form.email);
       navigate("/verify-otp");
     } catch (err: any) {
@@ -52,7 +50,7 @@ const Register = () => {
             value={form.email}
             onChange={handleChange}
             className="w-full border rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="you@example.com"
+            placeholder="you@gmail.com"
             required
           />
         </div>
@@ -83,14 +81,16 @@ const Register = () => {
           />
         </div>
 
-        {/* ✅ Password Strength Meter */}
-        <p
-          className={`text-sm mb-6 ${
-            getPasswordStrength() < 3 ? "text-red-500" : "text-green-600"
-          }`}
-        >
-          Password Strength: {getStrengthLabel()}
-        </p>
+        {/* ✅ Show Password Strength only after input */}
+        {form.password && (
+          <p
+            className={`text-sm mb-6 ${
+              getPasswordStrength() < 3 ? "text-red-500" : "text-green-600"
+            }`}
+          >
+            Password Strength: {getStrengthLabel()}
+          </p>
+        )}
 
         <button
           type="submit"

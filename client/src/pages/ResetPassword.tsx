@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import zxcvbn from "zxcvbn";
 import API from "../api/axios";
 
 const ResetPassword = () => {
@@ -8,6 +9,14 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const { token } = useParams();
   const navigate = useNavigate();
+
+  const getPasswordStrength = () => {
+    return zxcvbn(password).score;
+  };
+
+  const getStrengthLabel = () => {
+    return ["Too weak", "Weak", "Okay", "Good", "Strong"][getPasswordStrength()];
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,6 +27,10 @@ const ResetPassword = () => {
 
     if (password !== confirmPassword) {
       return toast.error("Passwords do not match.");
+    }
+
+    if (getPasswordStrength() < 3) {
+      return toast.error("Password is too weak. Please choose a stronger password.");
     }
 
     try {
@@ -48,6 +61,17 @@ const ResetPassword = () => {
             required
           />
         </div>
+
+        {/* ✅ Password strength appears only if password is typed */}
+        {password && (
+          <p
+            className={`text-sm mb-4 ${
+              getPasswordStrength() < 3 ? "text-red-500" : "text-green-600"
+            }`}
+          >
+            Password Strength: {getStrengthLabel()}
+          </p>
+        )}
 
         <div className="mb-6">
           <label className="block mb-1 font-medium">Confirm Password</label>
