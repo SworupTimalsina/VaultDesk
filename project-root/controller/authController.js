@@ -24,7 +24,7 @@ exports.register = asyncHandler(async (req, res) => {
 
   const user = await User.create({
     email,
-    password: hashedPassword,
+    password,
     phone,
     otp,
     otpExpires,
@@ -58,31 +58,40 @@ exports.verifyOTP = asyncHandler(async (req, res) => {
 // ✅ Login (only if verified)
 exports.login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
+  console.log("Incoming login:", email, password);
 
   const user = await User.findOne({ email });
-  if (!user) return res.status(401).json({ message: "Invalid credentials" });
+  if (!user) {
+    console.log("User not found");
+    return res.status(401).json({ message: "Invalid credentials" });
+  }
 
   if (!user.isVerified) {
+    console.log("Email not verified");
     return res.status(401).json({ message: "Please verify your email first." });
   }
 
   if (user.lockedUntil && user.lockedUntil > Date.now()) {
+    console.log("Account is locked");
     return res.status(403).json({ message: "Account temporarily locked." });
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
+    console.log("Wrong password");
     user.loginAttempts += 1;
     if (user.loginAttempts >= 5) {
       user.lockedUntil = Date.now() + 15 * 60 * 1000;
       await user.save();
       return res.status(403).json({ message: "Account locked for 15 minutes." });
     }
-
     await user.save();
     return res.status(401).json({ message: "Invalid credentials" });
   }
 
+  console.log("Login successful");
+
+  // Clear lock info
   user.loginAttempts = 0;
   user.lockedUntil = null;
   await user.save();
