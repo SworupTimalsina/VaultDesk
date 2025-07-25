@@ -1,7 +1,7 @@
 import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import API from "../api/axios";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -46,7 +46,7 @@ const Login = () => {
           />
         </div>
 
-        <div className="mb-6">
+        <div className="mb-2">
           <label className="block mb-1 font-medium">Password</label>
           <input
             type="password"
@@ -57,6 +57,16 @@ const Login = () => {
             placeholder="••••••••"
             required
           />
+        </div>
+
+        {/* 🔗 Forgot Password Link */}
+        <div className="text-right mb-6">
+          <Link
+            to="/forgot-password"
+            className="text-sm text-blue-600 hover:underline"
+          >
+            Forgot Password?
+          </Link>
         </div>
 
         <button
