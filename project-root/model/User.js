@@ -2,12 +2,20 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema({
+  name: { type: String },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  phone: { type: String, required: true },
-  role: { type: String, default: "user" },
+  phone: { type: String },
 
-  // 🔐 Security & Login
+  // 👤 Profile
+  profileImage: { type: String },
+  notifications: {
+    email: { type: Boolean, default: true },
+    sms: { type: Boolean, default: false },
+  },
+
+  // 🔐 Role & Login Security
+  role: { type: String, default: "user" },
   loginAttempts: { type: Number, default: 0 },
   lockedUntil: { type: Date, default: null },
 
@@ -22,7 +30,7 @@ const userSchema = new mongoose.Schema({
   isResetVerified: { type: Boolean, default: false },
 });
 
-// 🔒 Hash password before saving if modified
+// 🔒 Hash password before saving if changed
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   const salt = await bcrypt.genSalt(10);
@@ -30,7 +38,7 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-// 🔐 Compare raw password with hashed password
+// 🔐 Match raw password with hashed password
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
