@@ -1,12 +1,15 @@
+const dotenv = require("dotenv");
+dotenv.config();
 const express = require("express");
 const cors = require("cors");
-const dotenv = require("dotenv");
+console.log("✅ EMAIL_USER:", process.env.EMAIL_USER);
+console.log("✅ EMAIL_PASS:", process.env.EMAIL_PASS ? "✅ PRESENT" : "❌ MISSING");
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/authRoutes");
 const path = require("path");
 
-dotenv.config();
+
 const app = express();
 
 // ✅ Connect MongoDB
