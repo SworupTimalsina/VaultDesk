@@ -30,7 +30,7 @@ const OtpVerify = () => {
     }
 
     try {
-      const res = await axios.post("http://localhost:3000/api/auth/verify-otp", {
+      const res = await axios.post("https://localhost:3000/api/auth/verify-otp", {
         email,
         otp: code,
       });

@@ -9,15 +9,16 @@ const {
   resetPassword,
 } = require("../controller/authController");
 const loginLimiter = require("../middleware/loginLimiter");
+const upload = require("../middleware/uploadMiddleware"); // ✅ Multer config
 
 // 🔐 AUTH ROUTES
-router.post("/register", register);
+router.post("/register", upload.single("profileImage"), register); // ✅ FIXED
 router.post("/verify-otp", verifyOTP);
 router.post("/login", loginLimiter, login);
 
 // 🔁 FORGOT PASSWORD FLOW
-router.post("/forgot-password", forgotPassword);        // Step 1: Send OTP to email
-router.post("/verify-reset-otp", verifyResetOTP);       // Step 2: Verify the OTP
-router.post("/reset-password", resetPassword);          // Step 3: Update password
+router.post("/forgot-password", forgotPassword);
+router.post("/verify-reset-otp", verifyResetOTP);
+router.post("/reset-password", resetPassword);
 
 module.exports = router;
