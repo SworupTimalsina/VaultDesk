@@ -5,6 +5,7 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/authRoutes");
+const postRoutes = require("./routes/postRoutes");
 const path = require("path");
 const fs = require('fs');
 const https = require('https');
@@ -24,6 +25,9 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/posts", postRoutes);
+app.use("/api/payment", require("./routes/paymentRoutes"));
+
 
 
 const PORT = process.env.PORT || 3000;
