@@ -5,11 +5,22 @@ import { useNavigate } from "react-router-dom";
 import zxcvbn from "zxcvbn";
 
 const Register = () => {
-  const [form, setForm] = useState({ email: "", password: "", phone: "" });
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+    phone: "",
+    profileImage: null as File | null,
+  });
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value, files } = e.target;
+
+    if (name === "profileImage" && files) {
+      setForm({ ...form, profileImage: files[0] });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
   };
 
   const getPasswordStrength = () => {
@@ -23,7 +34,20 @@ const Register = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await API.post("/auth/register", form);
+      const formData = new FormData();
+      formData.append("email", form.email);
+      formData.append("phone", form.phone);
+      formData.append("password", form.password);
+      if (form.profileImage) {
+        formData.append("profileImage", form.profileImage);
+      }
+
+      const res = await API.post("/auth/register", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
       toast.success(res.data.message || "Registered successfully");
       localStorage.setItem("userEmail", form.email);
       navigate("/verify-otp");
@@ -37,6 +61,7 @@ const Register = () => {
       <form
         onSubmit={handleSubmit}
         className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md"
+        encType="multipart/form-data"
       >
         <h2 className="text-2xl font-bold mb-6 text-center text-blue-700">
           Create Your Account
@@ -68,6 +93,17 @@ const Register = () => {
           />
         </div>
 
+        <div className="mb-4">
+          <label className="block mb-1 font-medium">Profile Image</label>
+          <input
+            type="file"
+            name="profileImage"
+            accept="image/*"
+            onChange={handleChange}
+            className="w-full border rounded px-4 py-2"
+          />
+        </div>
+
         <div className="mb-1">
           <label className="block mb-1 font-medium">Password</label>
           <input
@@ -81,7 +117,6 @@ const Register = () => {
           />
         </div>
 
-        {/* ✅ Show Password Strength only after input */}
         {form.password && (
           <p
             className={`text-sm mb-6 ${
