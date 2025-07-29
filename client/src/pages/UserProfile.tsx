@@ -1,16 +1,35 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import API from "../api/axios";
 
-const UserProfile = ({ user }) => {
+interface User {
+  name: string;
+  phone: string;
+  notifications?: {
+    email: boolean;
+    sms: boolean;
+  };
+  profileImage?: string;
+}
+
+interface Props {
+  user: User;
+  onUpdated: () => void;
+}
+
+const UserProfile = ({ user, onUpdated }: Props) => {
+  const navigate = useNavigate();
+
   const [name, setName] = useState(user.name || "");
   const [phone, setPhone] = useState(user.phone || "");
-  const [emailNotify, setEmailNotify] = useState(user.notifications?.email);
-  const [smsNotify, setSmsNotify] = useState(user.notifications?.sms);
+  const [emailNotify, setEmailNotify] = useState(user.notifications?.email ?? false);
+  const [smsNotify, setSmsNotify] = useState(user.notifications?.sms ?? false);
   const [image, setImage] = useState<File | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     const formData = new FormData();
     formData.append("name", name);
     formData.append("phone", phone);
@@ -21,10 +40,16 @@ const UserProfile = ({ user }) => {
     try {
       const token = localStorage.getItem("token");
       await API.put("/user/update", formData, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
       });
+
       toast.success("Profile updated!");
+      onUpdated(); // Notify parent to refetch
     } catch (err: any) {
+      console.error("Update error:", err);
       toast.error(err.response?.data?.message || "Update failed");
     }
   };
@@ -53,16 +78,16 @@ const UserProfile = ({ user }) => {
               type="checkbox"
               checked={emailNotify}
               onChange={() => setEmailNotify(!emailNotify)}
-            />
-            {" "}Email Notifications
+            />{" "}
+            Email Notifications
           </label>
           <label>
             <input
               type="checkbox"
               checked={smsNotify}
               onChange={() => setSmsNotify(!smsNotify)}
-            />
-            {" "}SMS Notifications
+            />{" "}
+            SMS Notifications
           </label>
         </div>
         <input
@@ -70,9 +95,22 @@ const UserProfile = ({ user }) => {
           onChange={(e) => setImage(e.target.files?.[0] || null)}
           className="mb-4"
         />
-        <button className="bg-blue-600 text-white px-4 py-2 rounded" type="submit">
-          Update Profile
-        </button>
+
+        <div className="flex justify-between items-center">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
+          >
+            Back
+          </button>
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Update Profile
+          </button>
+        </div>
       </form>
     </div>
   );
