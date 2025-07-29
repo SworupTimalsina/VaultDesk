@@ -24,7 +24,7 @@ exports.register = asyncHandler(async (req, res) => {
 
   const user = await User.create({
     email,
-    password: hashedPassword,
+    password,
     phone,
     otp,
     otpExpires,
