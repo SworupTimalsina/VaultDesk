@@ -48,6 +48,14 @@ const EditProfile = ({ user, onUpdated }: { user: any; onUpdated: () => void }) 
         className="w-full p-2 border rounded"
       />
       <div className="flex gap-4">
+        {image && (
+  <img
+    src={URL.createObjectURL(image)}
+    alt="Preview"
+    className="mt-2 w-24 h-24 object-cover rounded-full border"
+  />
+)}
+
         <label>
           <input
             type="checkbox"
