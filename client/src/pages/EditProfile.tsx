@@ -8,9 +8,20 @@ const EditProfile = ({ user, onUpdated }: { user: any; onUpdated: () => void }) 
   const [emailNotify, setEmailNotify] = useState(user.notifications?.email || false);
   const [smsNotify, setSmsNotify] = useState(user.notifications?.sms || false);
   const [image, setImage] = useState<File | null>(null);
+  const [nameError, setNameError] = useState(false);
+
+  const containsHTML = (text: string) => /<[^>]*>/.test(text);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (containsHTML(name)) {
+      setNameError(true);
+      toast.error("Cannot contain HTML tags.");
+      return;
+    } else {
+      setNameError(false);
+    }
 
     const formData = new FormData();
     formData.append("name", name);
@@ -38,8 +49,9 @@ const EditProfile = ({ user, onUpdated }: { user: any; onUpdated: () => void }) 
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder="Full Name"
-        className="w-full p-2 border rounded"
+        className={`w-full p-2 border rounded ${nameError ? "border-red-500" : ""}`}
       />
+      {nameError && <p className="text-red-500 text-sm -mt-3">HTML tags are not allowed.</p>}
       <input
         type="tel"
         value={phone}
@@ -47,31 +59,14 @@ const EditProfile = ({ user, onUpdated }: { user: any; onUpdated: () => void }) 
         placeholder="Phone Number"
         className="w-full p-2 border rounded"
       />
-      <div className="flex gap-4">
+      <div className="flex gap-4 items-center">
         {image && (
-  <img
-    src={URL.createObjectURL(image)}
-    alt="Preview"
-    className="mt-2 w-24 h-24 object-cover rounded-full border"
-  />
-)}
-
-        <label>
-          <input
-            type="checkbox"
-            checked={emailNotify}
-            onChange={() => setEmailNotify(!emailNotify)}
+          <img
+            src={URL.createObjectURL(image)}
+            alt="Preview"
+            className="mt-2 w-24 h-24 object-cover rounded-full border"
           />
-          Email
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            checked={smsNotify}
-            onChange={() => setSmsNotify(!smsNotify)}
-          />
-          SMS
-        </label>
+        )}
       </div>
       <input
         type="file"

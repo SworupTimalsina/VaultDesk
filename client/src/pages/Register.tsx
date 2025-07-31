@@ -1,7 +1,7 @@
 import { useState } from "react";
 import API from "../api/axios";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import zxcvbn from "zxcvbn";
 
 const Register = () => {
@@ -129,10 +129,16 @@ const Register = () => {
 
         <button
           type="submit"
-          className="w-full bg-blue-700 text-white py-2 rounded hover:bg-blue-800 transition"
+          className="mb-5 w-full bg-blue-700 text-white py-2 rounded hover:bg-blue-800 transition"
         >
           Register
         </button>
+        <Link
+          to="/login"
+          className="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition font-semibold"
+        >
+          Log in
+        </Link>
       </form>
     </div>
   );

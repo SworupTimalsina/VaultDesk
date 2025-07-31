@@ -68,12 +68,19 @@ const Login = () => {
           </Link>
         </div>
 
+
         <button
           type="submit"
           className="bg-primary text-white w-full py-2 rounded-md text-base hover:bg-blue-800 transition"
         >
           Login
         </button>
+        <Link
+          to="/register"
+          className="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition font-semibold"
+        >
+          Register
+        </Link>
       </form>
     </div>
   );
