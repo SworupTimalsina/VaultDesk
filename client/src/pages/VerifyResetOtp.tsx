@@ -48,7 +48,7 @@ const VerifyResetOtp = () => {
           newPassword,
         });
         toast.success(res.data.message);
-        navigate("/login");
+        navigate("/");
       } catch (err: any) {
         toast.error(err.response?.data?.message || "Password reset failed");
       }

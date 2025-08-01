@@ -36,7 +36,7 @@ const Dashboard = () => {
     const token = localStorage.getItem("token");
     if (!token) {
       toast.error("Unauthorized. Please login.");
-      navigate("/login");
+      navigate("/");
       return;
     }
 
@@ -47,7 +47,7 @@ const Dashboard = () => {
       if (decodedPayload.exp * 1000 < Date.now()) {
         toast.error("Token expired. Please login again.");
         localStorage.removeItem("token");
-        navigate("/login");
+        navigate("/");
         return;
       }
 
@@ -59,7 +59,7 @@ const Dashboard = () => {
       console.error("JWT decode failed:", err);
       toast.error("Session invalid. Please login.");
       localStorage.removeItem("token");
-      navigate("/login");
+      navigate("/");
     }
   };
 
@@ -83,7 +83,7 @@ const Dashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     toast.success("Logged out successfully");
-    navigate("/login");
+    navigate("/");
   };
 
   const handleSubscribe = async () => {

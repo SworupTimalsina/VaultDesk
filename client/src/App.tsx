@@ -15,16 +15,9 @@ const App = () => {
     <>
       <Navbar />
       <Routes>
-        <Route
-          path="/"
-          element={
-            <h1 className="text-3xl font-bold text-center mt-10 text-blue-700">
-              VaultDesk Home
-            </h1>
-          }
-        />
+       
         <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Login />} />
         <Route path="/verify-otp" element={<OtpVerify />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/verify-reset-otp" element={<VerifyResetOtp />} />

@@ -36,7 +36,7 @@ const ResetPassword = () => {
     try {
       const res = await API.post(`/auth/reset-password/${token}`, { password });
       toast.success(res.data.message || "Password reset successful");
-      navigate("/login");
+      navigate("/");
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Reset failed");
     }

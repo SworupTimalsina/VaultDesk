@@ -16,7 +16,7 @@ const Home = () => {
             Get Started
           </a>
           <a
-            href="/login"
+            href="/"
             className="border border-primary text-primary px-6 py-2 rounded-md text-base hover:bg-blue-50 transition"
           >
             Sign In

@@ -36,7 +36,7 @@ const OtpVerify = () => {
       });
 
       toast.success(res.data.message);
-      navigate("/login");
+      navigate("/");
     } catch (err: any) {
       toast.error(err.response?.data?.message || "OTP verification failed.");
     }
